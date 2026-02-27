@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notes Arena - AI Edition</title>
+<title>Notes Arena - By HashTech</title>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <script type="importmap">
   {
@@ -1076,7 +1076,7 @@ function renderNotes(searchTerm = "") {
 }
 
 function permanentlyDelete(id) {
-    if(confirm("Dhyan dain! Ye note hamesha k liye delete ho jaye ga. Kya aap sure hain?")) {
+    if(confirm("Alert! This action will permanently delete! Are you Sure?")) {
         trash = trash.filter(x => x.id !== id);
         saveToStorage();
     }
