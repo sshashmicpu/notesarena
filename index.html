@@ -4,7 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notes Arena - AI Edition</title>
+
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#007bff">
+
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
 <script type="importmap">
   {
     "imports": {
@@ -14,6 +19,29 @@
     }
   }
 </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        console.log('Notes Arena: Service Worker Registered!');
+        
+        reg.onupdatefound = () => {
+          const installingWorker = reg.installing;
+          installingWorker.onstatechange = () => {
+            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // Jab aap GitHub pe sw.js ka version badlenge, ye alert aayega
+              if (confirm('Nayi update available hai! Kya aap Notes Arena ko refresh karna chahenge?')) {
+                window.location.reload();
+              }
+            }
+          };
+        };
+      }).catch(err => console.log('SW Registration Failed:', err));
+    });
+  }
+</script>
+
 <style id="themeStyle">
 * {
   margin: 0;
@@ -1080,6 +1108,45 @@ function importNotes(event) {
 }
 
 document.getElementById('searchBox').addEventListener('input', (e) => renderNotes(e.target.value));
+// --- Firebase Offline Persistence (Airplane Mode Support) ---
+try {
+  // Firestore instance hasil karna
+  const db = firebase.firestore(); 
+  
+  // Offline data save karne ki permission dena
+  firebase.firestore().enablePersistence({ synchronizeTabs: true })
+    .catch((err) => {
+      if (err.code == 'failed-precondition') {
+        console.warn('Offline persistence failed: Multiple tabs open');
+      } else if (err.code == 'unimplemented') {
+        console.warn('Offline persistence: Browser support nahi karta');
+      }
+    });
+} catch (e) {
+  console.error("Firebase Persistence Error:", e);
+}
+
+// --- PWA Service Worker Registration & Update Logic ---
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('Notes Arena: Service Worker Ready!');
+
+      // Nayi update check karne ka logic
+      reg.onupdatefound = () => {
+        const installingWorker = reg.installing;
+        installingWorker.onstatechange = () => {
+          if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // User ko update ka notification dena
+            if (confirm('Nayi update available hai! Kya aap Notes Arena ko abhi refresh karna chahenge?')) {
+              window.location.reload();
+            }
+          }
+        };
+      };
+    }).catch(err => console.error('SW Registration Failed:', err));
+  });
+}
 </script>
 </body>
 </html>
