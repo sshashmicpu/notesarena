@@ -795,15 +795,30 @@ async function askGemini() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
+
         const data = await res.json();
-        const aiText = data.candidates[0].content.parts[0].text;
-        responseArea.innerText = aiText;
+
+        // Ye line check karegi ke Google ne koi error to nahi bheja
+        if (data.error) {
+            responseArea.innerText = "Google Error: " + data.error.message;
+            console.log("Full Error:", data.error);
+            return;
+        }
+
+        // Agar sab theek hai to jawab dikhao
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const aiText = data.candidates[0].content.parts[0].text;
+            responseArea.innerText = aiText;
+        } else {
+            responseArea.innerText = "AI ne khali jawab bheja hai.";
+        }
+
     } catch (error) {
-        responseArea.innerText = "Error connecting to AI. Check your API Key.";
+        responseArea.innerText = "Network Error! Internet ya API link check karein.";
     } finally {
         loader.style.display = 'none';
     }
-}
+    
 
 function openAiModal() { document.getElementById('aiModal').style.display = 'block'; }
 
