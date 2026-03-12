@@ -1,5 +1,5 @@
 /* Notes Arena - Optimized Offline Service Worker */
-const CACHE_NAME = 'notes-arena-v1.5';
+const CACHE_NAME = 'notes-arena-v1.5.2';
 
 // Sirf main file ko cache karein kyunke CSS/JS isi ke andar hain
 const ASSETS_TO_CACHE = [
