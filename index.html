@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notes Arena - AI Edition</title>
+<title>Notes Arena - Firebase enabled</title>
 
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#007bff">
@@ -849,18 +849,33 @@ function solveCalc() {
     catch { document.getElementById('calcScreen').innerText = "Error"; calcExpression = ""; }
 }
 
+let syncTimer; 
+
 function liveUpdateNote(field, element) {
     autoDetectRTL(element);
     updateCharCount('viewBody', 'viewCharCounter');
+    
     const note = window.notes.find(n => n.id === editingId);
     if (note) {
+        // 1. Data ko variable mein update karein
         if (field === 'title') note.title = element.innerText;
         if (field === 'content') note.content = element.innerText;
         note.lastEdited = new Date().toLocaleString();
+        
+        // UI par time update karein
         document.getElementById('viewEditMeta').innerText = `Last Edited: ${note.lastEdited}`;
+        
+        // 2. LocalStorage mein FORAN save (Sab se important step)
         localStorage.setItem('ss_notes', JSON.stringify(window.notes));
-        if(window.syncNoteToFirebase) window.syncNoteToFirebase(note);
-        renderNotesGridOnly();
+        
+        // 3. Firebase Cloud Sync (1 minute baad)
+        clearTimeout(syncTimer); 
+        syncTimer = setTimeout(() => {
+            if(window.syncNoteToFirebase && (typeof currentUser !== 'undefined' && currentUser)) {
+                window.syncNoteToFirebase(note);
+                console.log("Cloud Backup Done!");
+            }
+        }, 60000); 
     }
 }
 
