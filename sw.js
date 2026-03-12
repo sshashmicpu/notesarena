@@ -1,5 +1,5 @@
 /* Notes Arena - Service Worker */
-const CACHE_NAME = 'notes-arena-v1'; // Jab bhi update karni ho, v1 ko v2 kar dein
+const CACHE_NAME = 'notes-arena-v1.1'; // Jab bhi update karni ho, v1 ko v2 kar dein
 
 // Un sab files ki list jo offline chalani hain
 const ASSETS_TO_CACHE = [
